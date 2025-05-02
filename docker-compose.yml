@@ -1,0 +1,40 @@
+version: '3.9'
+
+services:
+
+  dev-challenge:
+    build:
+      context: .
+      dockerfile: Dockerfile    
+    container_name: dev-challenge
+    depends_on:
+      - sqlserver
+    restart: unless-stopped
+    ports:
+      - 8080:8080
+    environment:
+      - ConnectionStrings__DefaultConnection=${CONNECTION_STRING_CHALLENGE}
+    networks:
+      - challenge-network
+
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: sqlserver
+    hostname: sqlserver
+    restart: unless-stopped
+    ports:
+      - '1434:1433'
+    environment:
+      - SA_PASSWORD=${SQL_2022_PASSWORD}
+      - ACCEPT_EULA=Y
+    volumes:
+    - sqlserver_data:/var/opt/mssql
+    networks:
+      - challenge-network
+
+networks:
+  challenge-network:
+    external: true
+
+volumes:
+  sqlserver_data:

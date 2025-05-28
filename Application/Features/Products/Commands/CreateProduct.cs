@@ -1,65 +1,50 @@
-﻿using Carter;
-using Carter.ModelBinding;
-using FluentValidation;
+﻿using FluentValidation;
 using MediatR;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Routing;
 using Application.Domain.Entities;
 using Application.Infrastructure.Persistence;
 
 namespace Application.Features.Products.Commands;
 
-public class CreateProduct : ICarterModule
+public class CreateProduct
 {
-    public void AddRoutes(IEndpointRouteBuilder app)
-    {
-        app.MapPost("api/products", async (HttpRequest req, IMediator mediator, CreateProductCommand command) =>
+    public record CreateProductCommand(string Name, string Description, double Price, int CategoryId) : IRequest<IResult>;
+   
+    public class CreateProductCommandtValidator : AbstractValidator<CreateProductCommand>{
+        public CreateProductCommandtValidator()
         {
-            return await mediator.Send(command);
-        })
-        .WithName(nameof(CreateProduct))
-        .WithTags(nameof(Product))
-        .ProducesValidationProblem()
-        .Produces(StatusCodes.Status201Created);
+            RuleFor(r => r.Name).NotEmpty().WithMessage("Product name is required.");
+            RuleFor(r => r.Description).NotEmpty().WithMessage("Product description is required.");
+            RuleFor(r => r.Price).GreaterThan(0).WithMessage("Product price must be greater than zero.");
+            RuleFor(r => r.CategoryId).GreaterThan(0).WithMessage("Category ID must be a valid positive integer.");
+        }
     }
 
-    public class CreateProductCommand : IRequest<IResult>
-    {
-        public string Name { get; set; } = string.Empty;
-        public string Description { get; set; } = string.Empty;
-        public double Price { get; set; }
-        public int CategoryId { get; set; }
-    }
-
-    public class CreateProductHandler(ApiDbContext context, IValidator<CreateProductCommand> validator)
-        : IRequestHandler<CreateProductCommand, IResult>
+    public class CreateProductHandler(ApiDbContext context, IValidator<CreateProductCommand> validator) : IRequestHandler<CreateProductCommand, IResult>
     {
         public async Task<IResult> Handle(CreateProductCommand request, CancellationToken cancellationToken)
         {
             var result = validator.Validate(request);
             if (!result.IsValid)
             {
-                return Results.ValidationProblem(result.GetValidationProblems());
+                var validationProblems = result.Errors
+                    .GroupBy(e => e.PropertyName)
+                    .ToDictionary(
+                        g => g.Key,
+                        g => g.Select(e => e.ErrorMessage).ToArray()
+                    );
+
+                return Results.ValidationProblem(validationProblems);
             }
 
             var newProduct = new Product(0, request.Name, request.Description, request.Price, request.CategoryId);
 
             context.Products.Add(newProduct);
 
-            await context.SaveChangesAsync();
+            await context.SaveChangesAsync(cancellationToken);
 
             return Results.Created($"api/products/{newProduct.ProductId}", null);
         }
     }
 
-    public class CreateProductValidator : AbstractValidator<CreateProductCommand>
-    {
-        public CreateProductValidator()
-        {
-            RuleFor(r => r.Name).NotEmpty();
-            RuleFor(r => r.Description).NotEmpty();
-            RuleFor(r => r.Price).NotEmpty();
-        }
-    }
 }

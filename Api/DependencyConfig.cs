@@ -1,4 +1,3 @@
-using Carter;
 using Microsoft.OpenApi.Models;
 
 namespace Api;
@@ -18,13 +17,13 @@ public static class DependencyConfig
 
         });
 
-        services.AddCarter();
+        services.AddControllers();
 
-        services.AddOpenApi();
+        services.AddProblemDetails();
 
         services.AddRouting(options => options.LowercaseUrls = true);
 
-        services.AddProblemDetails();
+        services.AddOpenApi();
 
     }
 
@@ -40,7 +39,8 @@ public static class DependencyConfig
         });
 
         app.UseHttpsRedirection();
-        app.MapCarter();
+
+        app.MapControllers();
 
     }
 

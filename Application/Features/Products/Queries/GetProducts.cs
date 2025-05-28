@@ -1,38 +1,28 @@
 ﻿using AutoMapper;
 using AutoMapper.QueryableExtensions;
-using Carter;
 using MediatR;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
 using Application.Domain.Entities;
 using Application.Infrastructure.Persistence;
 
 namespace Application.Features.Products.Queries;
-public class GetProducts : ICarterModule
+public class GetProducts
 {
-    public void AddRoutes(IEndpointRouteBuilder app)
+    public record GetProductsQuery() : IRequest<IEnumerable<GetProductsResponse>>;
+    public record GetProductsResponse(int ProductId, string Name, string Description, double Price, string CategoryName);
+
+
+    public class GetProductsHandler(ApiDbContext context, IMapper mapper): IRequestHandler<GetProductsQuery, IEnumerable<GetProductsResponse>>
     {
-        app.MapGet("api/products", (IMediator mediator) =>
-        {
-            return mediator.Send(new GetProductsQuery());
-        })
-        .WithName(nameof(GetProducts))
-        .WithTags(nameof(Product));
+        public Task<IEnumerable<GetProductsResponse>> Handle(GetProductsQuery request, CancellationToken cancellationToken) {
+            
+            var response = context.Products.ProjectTo<GetProductsResponse>(mapper.ConfigurationProvider)
+                .AsNoTracking()
+                .ToListAsync(cancellationToken); 
 
-    }
-
-    public class GetProductsQuery : IRequest<List<GetProductsResponse>>
-    {
-
-    }
-
-    public class GetProductsHandler(ApiDbContext context, IMapper mapper)
-        : IRequestHandler<GetProductsQuery, List<GetProductsResponse>>
-    {
-        public Task<List<GetProductsResponse>> Handle(GetProductsQuery request, CancellationToken cancellationToken) =>
-            context.Products.ProjectTo<GetProductsResponse>(mapper.ConfigurationProvider).ToListAsync();
+            return response.ContinueWith(task => task.Result.AsEnumerable(), cancellationToken);
+        }
+            
     }
 
     public class GetProductsMappingProfile : Profile
@@ -44,6 +34,5 @@ public class GetProducts : ICarterModule
             );
     }
 
-    public record GetProductsResponse(int ProductId, string Name, string Description, double Price, string CategoryName);
-
+  
 }

@@ -1,28 +1,14 @@
 ﻿using AutoMapper;
 using AutoMapper.QueryableExtensions;
-using Carter;
 using MediatR;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
 using Application.Domain.Entities;
 using Application.Infrastructure.Persistence;
 
 namespace Application.Features.Categories.Queries;
 
-public class GetCategories : ICarterModule
+public class GetCategories 
 {
-    public void AddRoutes(IEndpointRouteBuilder app)
-    {
-        app.MapGet("api/categories", (IMediator mediator) =>
-        {
-            return mediator.Send(new GetCategoriesQuery());
-        })
-        .WithName(nameof(GetCategories))
-        .WithTags(nameof(Category));
-    }
-
     public class GetCategoriesQuery : IRequest<List<GetCategoriesResponse>>
     {
 

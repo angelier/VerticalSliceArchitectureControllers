@@ -1,29 +1,12 @@
-﻿using Carter;
-using Carter.ModelBinding;
-using FluentValidation;
+﻿using FluentValidation;
 using MediatR;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Routing;
-using Application.Domain.Entities;
 using Application.Infrastructure.Persistence;
 
 namespace Application.Features.Products.Commands;
 
-public class UpdateProduct : ICarterModule
+public class UpdateProduct 
 {
-    public void AddRoutes(IEndpointRouteBuilder app)
-    {
-        app.MapPut("api/products", async (IMediator mediator, UpdateProductCommand command) =>
-        {
-            return await mediator.Send(command);
-        })
-        .WithName(nameof(UpdateProduct))
-        .WithTags(nameof(Product))
-        .Produces(StatusCodes.Status404NotFound)
-        .ProducesValidationProblem();
-    }
-
     public class UpdateProductCommand : IRequest<IResult>
     {
         public int ProductId { get; set; }
@@ -39,10 +22,10 @@ public class UpdateProduct : ICarterModule
         public async Task<IResult> Handle(UpdateProductCommand request, CancellationToken cancellationToken)
         {
             var result = validator.Validate(request);
-            if (!result.IsValid)
-            {
-                return Results.ValidationProblem(result.GetValidationProblems());
-            }
+            // if (!result.IsValid)
+            // {
+            //     return Results.ValidationProblem(result.GetValidationProblems());
+            // }
 
             var product = await context.Products.FindAsync(request.ProductId);
 

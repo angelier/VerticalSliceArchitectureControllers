@@ -13,4 +13,4 @@ var app = builder.Build();
 
 app.UseApiConfigure();
 
-app.Run();
+await app.RunAsync();

@@ -1,27 +1,11 @@
-﻿using Carter;
-using MediatR;
-using Microsoft.AspNetCore.Builder;
+﻿using MediatR;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Routing;
-using Application.Domain.Entities;
 using Application.Infrastructure.Persistence;
 
 namespace Application.Features.Products.Commands;
 
-public class DeleteProduct : ICarterModule
+public class DeleteProduct 
 {
-    public void AddRoutes(IEndpointRouteBuilder app)
-    {
-        app.MapDelete("api/products/{productId}", async (IMediator mediator, int productId) =>
-        {
-            return await mediator.Send(new DeleteProductCommand(productId));
-        })
-        .WithName(nameof(DeleteProduct))
-        .WithTags(nameof(Product))
-        .Produces(StatusCodes.Status200OK)
-        .Produces(StatusCodes.Status404NotFound);
-    }
-
     public class DeleteProductCommand(int productId) : IRequest<IResult>
     {
         public int ProductId { get; set; } = productId;

@@ -13,7 +13,7 @@ public class Product(int productId, string name, string description, double pric
     public int CategoryId { get; private set; } = categoryId;
     public Category? Category { get; private set; }
 
-    public List<DomainEvent> DomainEvents { get; set; } = new List<DomainEvent>();
+    public List<DomainEvent> DomainEvents { get; set; } = [];
 
     public void UpdateInfo(UpdateProduct.UpdateProductCommand command)
     {

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using static Application.Features.Products.Queries.GetProductById;
 using static Application.Features.Products.Queries.GetProducts;
 
 namespace Api.Controllers
@@ -13,12 +14,6 @@ namespace Api.Controllers
     public class ProductsController (IMediator mediator) : ControllerBase
     {
         private readonly IMediator _mediator = mediator;
-        private static readonly List<string> Products = new List<string>
-        {
-            "Product1",
-            "Product2",
-            "Product3"
-        };
 
         [HttpGet]
         [ProducesResponseType(typeof(IEnumerable<string>), 200)]
@@ -27,21 +22,53 @@ namespace Api.Controllers
         public async Task<ActionResult<IEnumerable<string>>> GetProductsAsync()
         {
 
-            var response = await _mediator.Send(new GetProductsQuery());
-            return Ok(Products);
+            var products = await _mediator.Send(new GetProductsRequest());
+            return Ok(products);
         }
 
         [HttpGet("{id}")]
         [EndpointDescription("Retrieves product by their unique identifier.")]
         [Produces("application/json")]    
         [ProducesResponseType(404)]
-        public ActionResult<string> GetProduct(int id)
+        public async Task<ActionResult<string>> GetProduct(int id)
         {
-            if (id < 0 || id >= Products.Count)
+            var product = await _mediator.Send(new GetProductByIdRequest(id));
+            if (product == null)
             {
-                return NotFound();
+                return NotFound($"Product with ID {id} not found.");
             }
-            return Ok(Products[id]);
+
+            return Ok(product);
+        }
+
+        [HttpGet]
+        [ProducesResponseType(typeof(IEnumerable<string>), 200)]
+        [EndpointDescription("Retrieves all products in the system.")]
+        [Produces("application/json")]
+        public void  GetPrueba()
+        {
+
+
+
+            var foo = 1;
+
+            switch (foo)
+            {
+                                    case 1: Console.WriteLine("Case 1 executed");
+            break;
+                case 2:
+                                           Console.WriteLine("Case 2 executed");
+                    break;
+             case 3:
+                             Console.WriteLine("Case 3 executed");
+                    break;
+                case 4:
+                                    Console.WriteLine("Case 4 executed");
+                    Console.WriteLine("Case 4 executed again");
+                                 break;
+                default:
+                    break;
+            }
         }
     }
 }

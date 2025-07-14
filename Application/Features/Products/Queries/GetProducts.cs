@@ -8,19 +8,19 @@ using Application.Infrastructure.Persistence;
 namespace Application.Features.Products.Queries;
 public class GetProducts
 {
-    public record GetProductsQuery() : IRequest<IEnumerable<GetProductsResponse>>;
+    public record GetProductsRequest() : IRequest<IEnumerable<GetProductsResponse>>;
     public record GetProductsResponse(int ProductId, string Name, string Description, double Price, string CategoryName);
 
-
-    public class GetProductsHandler(ApiDbContext context, IMapper mapper): IRequestHandler<GetProductsQuery, IEnumerable<GetProductsResponse>>
+    public class GetProductsHandler(ApiDbContext context, IMapper mapper): IRequestHandler<GetProductsRequest, IEnumerable<GetProductsResponse>>
     {
-        public Task<IEnumerable<GetProductsResponse>> Handle(GetProductsQuery request, CancellationToken cancellationToken) {
-            
-            var response = context.Products.ProjectTo<GetProductsResponse>(mapper.ConfigurationProvider)
+        public async Task<IEnumerable<GetProductsResponse>> Handle(GetProductsRequest request, CancellationToken cancellationToken)
+        {
+            var products = await context.Products
+                .ProjectTo<GetProductsResponse>(mapper.ConfigurationProvider)
                 .AsNoTracking()
-                .ToListAsync(cancellationToken); 
+                .ToListAsync(cancellationToken);
 
-            return response.ContinueWith(task => task.Result.AsEnumerable(), cancellationToken);
+            return products;
         }
             
     }

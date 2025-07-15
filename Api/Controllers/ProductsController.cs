@@ -11,14 +11,14 @@ namespace Api.Controllers
 {
     [Route("api/v1/[controller]")]
     [ApiController]
-    public class ProductsController (IMediator mediator) : ControllerBase
+    public class ProductsController(IMediator mediator) : ControllerBase
     {
         private readonly IMediator _mediator = mediator;
 
         [HttpGet]
         [ProducesResponseType(typeof(IEnumerable<string>), 200)]
         [EndpointDescription("Retrieves all products in the system.")]
-        [Produces("application/json")]  
+        [Produces("application/json")]
         public async Task<ActionResult<IEnumerable<string>>> GetProductsAsync()
         {
 
@@ -28,7 +28,7 @@ namespace Api.Controllers
 
         [HttpGet("{id}")]
         [EndpointDescription("Retrieves product by their unique identifier.")]
-        [Produces("application/json")]    
+        [Produces("application/json")]
         [ProducesResponseType(404)]
         public async Task<ActionResult<string>> GetProduct(int id)
         {
@@ -45,7 +45,7 @@ namespace Api.Controllers
         [ProducesResponseType(typeof(IEnumerable<string>), 200)]
         [EndpointDescription("Retrieves all products in the system.")]
         [Produces("application/json")]
-        public void  GetPrueba()
+        public void GetPrueba()
         {
 
 
@@ -53,18 +53,16 @@ namespace Api.Controllers
 
             switch (foo)
             {
-                                    case 1: Console.WriteLine("Case 1 executed");
-            break;
+                case 1:
+                    Console.WriteLine("Case 1 executed");
+                    break;
                 case 2:
-                                           Console.WriteLine("Case 2 executed");
+                    Console.WriteLine("Case 2 executed");
                     break;
-             case 3:
-                             Console.WriteLine("Case 3 executed");
+                case 3:
+                    Console.WriteLine("Case 3 executed");
                     break;
-                case 4:
-                                    Console.WriteLine("Case 4 executed");
-                    Console.WriteLine("Case 4 executed again");
-                                 break;
+
                 default:
                     break;
             }

@@ -1,15 +1,19 @@
-#!/bin/sh; C:/Program\ Files/Git/usr/bin/sh.exe
-echo "running precommit hook"
-LC_ALL=C
-# Select files to format
+#!/bin/sh
 
-GITFILES=$(git diff --name-only --diff-filter=ACM "*.cs" | sed 's| |\\ |g') 
-# remove root src dir from git file path when passing to dotnet format
+echo "running precommit hook"
+export LC_ALL=C
+
+# Select files to format
+GITFILES=$(git diff --name-only --cached --diff-filter=ACM "*.cs" | sed 's| |\\ |g')
+
 [ -z "$GITFILES" ] && exit 0
-# Format all selected files
-echo "$DOTNETFORMATFILES"
-dotnet-format -v diag -f .
+
+echo "Files to format:"
+echo "$GITFILES"
+
+# Format only the changed files
+echo "$GITFILES" | xargs dotnet-format -v diag -f
 
 # Add back the modified files to staging
-echo "$GITFILES" |  git add .
+echo "$GITFILES" | xargs git add
 exit 0

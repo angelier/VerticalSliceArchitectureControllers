@@ -49,7 +49,6 @@ namespace Api.Controllers
         {
 
 
-
             var foo = 1;
 
             switch (foo)
@@ -62,6 +61,10 @@ namespace Api.Controllers
              case 3:
                              Console.WriteLine("Case 3 executed");
                     break;
+                case 4:
+                                    Console.WriteLine("Case 4 executed");
+                    Console.WriteLine("Case 4 executed again");
+                                 break;
                 default:
                     break;
             }
